@@ -12,19 +12,14 @@ import { useCart } from "../context/CartContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
 // ---- Store / bank configuration -------------------------------------
-// Swap these placeholders for your real merchant bank details.
 const BANK_INFO = {
-  bankId: "MB", // VietQR bank code/BIN — MB Bank
+  bankId: "MB", 
   bankName: "MB Bank",
   accountNumber: "0865156242",
   accountName: "DUONG THI KIM YEN",
 };
 
-// Store prices are listed in USD; VietQR transfers are in VND, so we
-// convert using a fixed illustrative rate. Replace with a live rate
-// or your own VND pricing in production.
 const USD_TO_VND = 25000;
-
 const FREE_SHIPPING_THRESHOLD = 150;
 const SHIPPING_FEE = 8;
 
@@ -37,14 +32,20 @@ export default function Checkout() {
   const { cartItems, subtotal, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
 
+  // 🔽 ĐÂY LÀ VỊ TRÍ CHÈN CHUẨN NHẤT 🔽
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: "/checkout" }} replace />;
+  }
+  // 🔼 -------------------------------- 🔼
+
   const [form, setForm] = useState({
     fullName: user?.fullName || "",
     phone: user?.phone || "",
     address: "",
   });
   const [errors, setErrors] = useState({});
-  const [paymentMethod, setPaymentMethod] = useState("cod"); // 'cod' | 'bank'
-  const [order, setOrder] = useState(null); // set once order is placed
+  const [paymentMethod, setPaymentMethod] = useState("cod"); 
+  const [order, setOrder] = useState(null); 
   const [copied, setCopied] = useState(false);
 
   const shippingFee = subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
@@ -97,14 +98,10 @@ export default function Checkout() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Redirect away if there's nothing to check out and no order was just placed
   if (cartItems.length === 0 && !order) {
     return <Navigate to="/shop" replace />;
   }
 
-  // ---------------------------------------------------------------
-  // Order confirmation view
-  // ---------------------------------------------------------------
   if (order) {
     const amountVnd = Math.round(order.total * USD_TO_VND);
     return (
@@ -202,21 +199,9 @@ export default function Checkout() {
     );
   }
 
-  // ---------------------------------------------------------------
-  // Checkout form view
-  // ---------------------------------------------------------------
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-2xl sm:text-3xl font-semibold mb-4">Checkout</h1>
-
-      {!isAuthenticated && (
-        <p className="text-sm text-stone mb-8">
-          <Link to="/login" state={{ from: "/checkout" }} className="text-ink border-b border-ink pb-0.5">
-            Sign in
-          </Link>{" "}
-          for faster checkout, or continue as a guest below.
-        </p>
-      )}
 
       <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-12">
         {/* Left: Shipping Information */}
@@ -326,7 +311,6 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* Payment method selection */}
           <div className="mt-8">
             <h2 className="text-sm uppercase tracking-widest2 font-medium mb-4">
               Payment Method
