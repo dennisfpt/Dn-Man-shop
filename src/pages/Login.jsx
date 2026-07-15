@@ -19,6 +19,15 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // 1. Kiểm tra định dạng mật khẩu bằng JS trước khi gửi lên AuthContext
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    if (!passwordRegex.test(form.password)) {
+      setError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm cả chữ, số và ít nhất một ký tự đặc biệt (@$!%*#?&)");
+      return; // Dừng lại không cho đăng nhập tiếp
+    }
+
+    // 2. Nếu mật khẩu đúng định dạng, tiến hành đăng nhập
     const result = login(form);
     if (!result.success) {
       setError(result.message);
@@ -37,7 +46,8 @@ export default function Login() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Thêm noValidate để chặn bong bóng báo lỗi tiếng Anh mặc định của trình duyệt */}
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div>
           <label className="text-xs uppercase tracking-wide text-stone">Email</label>
           <input
