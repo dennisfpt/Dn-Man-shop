@@ -25,10 +25,18 @@ export default function Register() {
     if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = "Enter a valid email";
     if (!/^[0-9+\s-]{8,15}$/.test(form.phone.trim()))
       next.phone = "Enter a valid phone number";
-    if (form.password.length < 6)
-      next.password = "Password must be at least 6 characters";
+
+    // 1. Định nghĩa RegExp kiểm tra: Ít nhất 8 ký tự, 1 chữ cái, 1 chữ số, 1 ký tự đặc biệt
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    
+    // 2. Tiến hành kiểm tra mật khẩu đầu vào
+    if (!passwordRegex.test(form.password)) {
+      next.password = "Password must be at least 8 characters, and include letters, numbers, and at least one special character (@$!%*#?&)";
+    }
+
     if (form.confirmPassword !== form.password)
       next.confirmPassword = "Passwords do not match";
+    
     setErrors(next);
     return Object.keys(next).length === 0;
   };
